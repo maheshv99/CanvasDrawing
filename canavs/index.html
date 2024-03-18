@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        .main{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+        header,
+        footer {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        input,
+        select,
+        button,
+        .block {
+            width: 80%;
+        }
+     
+   option,input{
+    box-sizing: border-box;
+    padding: 9px;
+   }
+
+        canvas {
+            border: 2px solid black;
+        }
+        footer button{
+            margin: 0px 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="main">
+
+
+
+    <header>
+        <div class="block">
+            <h3>Text Color picker</h3>
+            <input type="color" name="color" id="fontColor">
+        </div>
+        <div class="block">
+            <h3>Background</h3>
+            <input type="color" name="background" id="backgroundColor">
+        </div>
+        <div class="block">
+            <h3>Font Size</h3>
+            <select name="fontSize" id="fontSize">
+                <option value="5">5px</option>
+                <option value="10">10px</option>
+                <option value="20">20px</option>
+                <option value="30">30px</option>
+                <option value="40">40px</option>
+                <option value="50">50px</option>
+            </select>
+        </div>
+    </header>
+
+
+    <main>
+        <canvas id="myCanvas" width="800px" height="500px"></canvas>
+    </main>
+
+
+
+
+    <footer>
+        <button class="btn btn-danger clearbtn">Clear</button>
+        <button class="btn btn-success savebtn">Save & download</button>
+        <button class="btn btn-warning retrivebtn">Retrive saved images</button>
+    </footer>
+</div>
+<script>
+    const fontColor=document.getElementById('fontColor');
+    const backgroundColor=document.getElementById('backgroundColor');
+    const clearbtn=document.getElementsByClassName('clearbtn')[0];
+    const savebtn=document.getElementsByClassName('savebtn')[0];
+    const retrivebtn=document.getElementsByClassName('retrivebtn')[0];
+    const fontSize=document.getElementById('fontSize');
+    const myCanvas=document.getElementById('myCanvas');
+    const ctx=myCanvas.getContext('2d');
+    console.log(ctx);
+    var lastX;
+    var lastY;
+    var isDrwaing=false;
+    fontColor.addEventListener('change',(e)=>{
+        console.log(e.target.value);
+        ctx.strokeStyle=e.target.value;
+        ctx.fillStyle=e.target.value;
+    })
+    backgroundColor.addEventListener('change',(e)=>{
+        console.log(e.target.value);
+    })
+    fontSize.addEventListener('change',(e)=>{
+        console.log(e.target.value);
+    })
+    myCanvas.addEventListener('mousedown',(e)=>{
+        console.log(e);
+        isDrwaing = true;
+        lastX=event.offsetX;
+        lastY=event.offsetY;
+    })
+    myCanvas.addEventListener('mousemove',(e)=>{
+        if(isDrwaing){
+            ctx.beginPath();
+            ctx.moveTo(lastX,lastY);
+            ctx.lineTo(event.offsetX,event.offsetY);
+            ctx.stroke();
+            lastX=event.offsetX;
+            lastY=event.offsetY;
+        }
+    })
+    myCanvas.addEventListener('mouseup',(e)=>{
+        isDrwaing=false;
+    })
+    backgroundColor.addEventListener('change',(e)=>{
+        ctx.fillStyle=e.target.value;
+        ctx.fillRect(0,0,800,500);
+    })
+    fontSize.addEventListener('change',(e)=>{
+        ctx.lineWidth=e.target.value;
+    })
+    clearbtn.addEventListener('click',()=>{
+        ctx.clearRect(0,0,myCanvas.width,myCanvas.height);
+    })
+    savebtn.addEventListener('click',()=>{
+       localStorage.setItem('canvasContent',myCanvas.toDataURL());
+       let link=document.createElement('a');
+       link.download="my canvas.png";
+       link.href=myCanvas.toDataURL();
+       link.click();
+    })
+    retrivebtn.addEventListener('click',()=>{
+        let savedImage=localStorage.getItem('canvasContent');
+        if(savedImage){
+            let img=new Image();
+            img.src=savedImage;
+
+            ctx.drawImage(img,0,0);
+        }
+    })
+    
+</script>
+</body>
+
+</html>
